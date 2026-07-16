@@ -2,7 +2,7 @@
 
 A full-stack menstrual health tracker that helps users log periods, track symptoms and mood, get data-driven cycle predictions, and access general health education — built with privacy as a core design principle throughout.
 
-**Live Demo:** [Add your deployed link here once live]
+**Live Demo:** https://cycelcare-gqphc8xy2-bhavika-suthar.vercel.app
 **Backend Repo/Folder:** `/server`
 **Frontend Repo/Folder:** `/client`
 
