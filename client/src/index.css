@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-[#FDFCFE] font-nunito text-slate-800;
+}
+/* Customizing React Calendar to match CycleCare */
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: 'Nunito', sans-serif !important;
+}
+
+.react-calendar__tile {
+  padding: 1.5em 0.5em !important;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+.react-calendar__tile--active {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Our custom classes applied via tileClassName */
+.bg-lavender-main {
+  background-color: #9B7FD4 !important;
+  color: white !important;
+}
+
+.border-lavender-main {
+  border-color: #9B7FD4 !important;
+}
+
+.react-calendar__navigation button {
+  font-weight: 800;
+  color: #7C5CC4;
+  font-size: 1.1rem;
+}
