@@ -14,13 +14,13 @@ exports.signup = async (req, res) => {
     });
 
     const token = signToken(newUser._id);
-    
+
     res.cookie('jwt', token, {
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
+      secure: true,
+      sameSite: 'None'
     });
-
     // Remove password from output
     newUser.password = undefined;
 
@@ -51,8 +51,8 @@ exports.login = async (req, res) => {
     res.cookie('jwt', token, {
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax'
+      secure: true,
+      sameSite: 'None'
     });
 
     user.password = undefined; // Remove from response
@@ -71,17 +71,17 @@ exports.getMe = async (req, res) => {
 };
 exports.updateMe = async (req, res) => {
   try {
-    const { 
-      name, 
-      email, 
-      averageCycleLength, 
-      useManualCycleLength, 
-      partnerEmail, 
-      partnerNotificationsEnabled 
+    const {
+      name,
+      email,
+      averageCycleLength,
+      useManualCycleLength,
+      partnerEmail,
+      partnerNotificationsEnabled
     } = req.body;
-    
+
     const updatedUser = await User.findByIdAndUpdate(
-      req.user.id, 
+      req.user.id,
       { name, email, averageCycleLength, useManualCycleLength, partnerEmail, partnerNotificationsEnabled },
       { new: true, runValidators: true }
     );
@@ -94,9 +94,11 @@ exports.updateMe = async (req, res) => {
     res.status(400).json({ status: 'fail', message: err.message });
   }
 };
- exports.logout = (req, res) => {
+exports.logout = (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
+    secure: true,
+    sameSite: 'None',
     expires: new Date(0),
   });
   res.status(200).json({ status: 'success', message: 'Logged out successfully' });
