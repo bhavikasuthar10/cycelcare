@@ -18,7 +18,11 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://cycelcare-gqphc8xy2-bhavika-suthar.vercel.app'],
+  origin: [
+    'http://localhost:5173', 
+    'https://cycelcare-gqphc8xy2-bhavika-suthar.vercel.app',
+    'https://cycelcare-git-main-bhavika-suthar.vercel.app'
+  ],
   credentials: true
 }));
 // Database Connection
