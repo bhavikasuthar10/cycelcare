@@ -47,3 +47,6 @@ app.get('/api/test-auth', protect, (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server glowing on port ${PORT}`));
+
+const app = express();
+app.set('trust proxy', 1);
