@@ -45,23 +45,30 @@ const Dashboard = () => {
   };
 
   const getTileClassName = ({ date, view }) => {
-    if (view !== 'month') return;
+  if (view !== 'month') return;
 
-    const day = startOfDay(date);
+  // Convert the calendar's displayed date to a UTC-midnight timestamp for fair comparison
+  const day = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 
-    const isPeriodDay = cycles.some(cycle => {
-      const start = startOfDay(parseISO(cycle.startDate));
-      const end = cycle.endDate ? startOfDay(parseISO(cycle.endDate)) : start;
-      return isWithinInterval(day, { start, end });
-    });
+  const isPeriodDay = cycles.some(cycle => {
+    const start = new Date(cycle.startDate);
+    start.setUTCHours(0, 0, 0, 0);
+    const end = cycle.endDate ? (() => {
+      const e = new Date(cycle.endDate);
+      e.setUTCHours(0, 0, 0, 0);
+      return e;
+    })() : start;
+    return day.getTime() >= start.getTime() && day.getTime() <= end.getTime();
+  });
 
-    if (isPeriodDay) return 'bg-lavender-main text-white rounded-full';
+  if (isPeriodDay) return 'bg-lavender-main text-white rounded-full';
 
-    if (insights?.predictedNextPeriod) {
-      const predicted = startOfDay(parseISO(insights.predictedNextPeriod));
-      if (day.getTime() === predicted.getTime()) return 'border-2 border-dashed border-lavender-main text-lavender-main rounded-full';
-    }
-  };
+  if (insights?.predictedNextPeriod) {
+    const predicted = new Date(insights.predictedNextPeriod);
+    predicted.setUTCHours(0, 0, 0, 0);
+    if (day.getTime() === predicted.getTime()) return 'border-2 border-dashed border-lavender-main text-lavender-main rounded-full';
+  }
+};
 
   useEffect(() => {
     fetchDashboardData();
@@ -194,7 +201,7 @@ const Dashboard = () => {
                   <div key={cycle._id} className="group flex items-center justify-between p-4 rounded-2xl bg-lavender-light/50 border border-transparent hover:border-lavender-soft transition-all">
                     <div>
                       <p className="font-bold text-gray-700">
-                        {format(new Date(cycle.startDate), 'MMM d')} — {cycle.endDate ? format(new Date(cycle.endDate), 'MMM d') : 'Present'}
+                        {new Date(cycle.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })} — {cycle.endDate ? new Date(cycle.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'Present'}
                       </p>
                       <span className="text-xs uppercase font-bold text-lavender-main tracking-wider">
                         {cycle.intensity} flow
