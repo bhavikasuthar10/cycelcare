@@ -5,38 +5,52 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('cyclecare_token') || null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is logged in on page load
   useEffect(() => {
     const checkLoggedIn = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       try {
-        // We'll use our stats/insights route as a "check"
-        // If it succeeds, the user is authenticated
-        const res = await api.get('/auth/me'); // We might need to add this route to backend
+        const res = await api.get('/auth/me');
         setUser(res.data.data.user);
       } catch (err) {
         setUser(null);
+        setToken(null);
+        localStorage.removeItem('cyclecare_token');
       } finally {
         setLoading(false);
       }
     };
     checkLoggedIn();
-  }, []);
+  }, [token]);
+
+  const loginWithToken = (newToken, userData) => {
+    localStorage.setItem('cyclecare_token', newToken);
+    setToken(newToken);
+    setUser(userData);
+  };
+
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      localStorage.removeItem('cyclecare_token');
+      setToken(null);
+      setUser(null);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading , logout }}>
+    <AuthContext.Provider value={{ user, setUser, loading, logout, loginWithToken }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-const logout = async () => {
-  try {
-    await api.post('/auth/logout');
-    setUser(null);
-  } catch (err) {
-    console.error("Logout failed", err);
-  }
-};

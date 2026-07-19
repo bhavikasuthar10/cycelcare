@@ -7,18 +7,18 @@ const Signup = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', averageCycleLength: 28 });
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); // Assuming login logic in context handles state
+  const { loginWithToken } = useAuth();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await API.post('/auth/signup', formData);
-      // Auto-login after signup or redirect to login
-      navigate('/login');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
-    }
-  };
+  e.preventDefault();
+  try {
+    const response = await API.post('/auth/signup', formData);
+    loginWithToken(response.data.token, response.data.data.user);
+    navigate('/');
+  } catch (err) {
+    setError(err.response?.data?.message || 'Something went wrong');
+  }
+};
 
   return (
     <div className="min-h-screen bg-lavender-light flex items-center justify-center p-4">

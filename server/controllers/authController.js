@@ -14,17 +14,9 @@ exports.signup = async (req, res) => {
     });
 
     const token = signToken(newUser._id);
-
-    res.cookie('jwt', token, {
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None'
-    });
-    // Remove password from output
     newUser.password = undefined;
 
-    res.status(201).json({ status: 'success', data: { user: newUser } });
+    res.status(201).json({ status: 'success', token, data: { user: newUser } });
   } catch (err) {
     res.status(400).json({ status: 'fail', message: err.message });
   }
@@ -33,35 +25,26 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1) Check if email and password exist
     if (!email || !password) {
       return res.status(400).json({ status: 'fail', message: 'Please provide email and password' });
     }
 
-    // 2) Check if user exists && password is correct
-    const user = await User.findOne({ email }).select('+password'); // We need to explicitly select password because it's hidden by default usually
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.correctPassword(password, user.password))) {
       return res.status(401).json({ status: 'fail', message: 'Incorrect email or password' });
     }
 
-    // 3) If everything ok, send token to client
     const token = signToken(user._id);
+    user.password = undefined;
 
-    res.cookie('jwt', token, {
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None'
-    });
-
-    user.password = undefined; // Remove from response
-
-    res.status(200).json({ status: 'success', data: { user } });
+    res.status(200).json({ status: 'success', token, data: { user } });
   } catch (err) {
     res.status(400).json({ status: 'fail', message: err.message });
   }
 };
+
+   
 exports.getMe = async (req, res) => {
   try {
     res.status(200).json({ status: 'success', data: { user: req.user } });

@@ -9,8 +9,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { setUser } = useAuth();
+
+  const { loginWithToken } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,8 +20,8 @@ const Login = () => {
 
     try {
       const response = await api.post('/auth/login', { email, password });
-      setUser(response.data.data.user);
-      navigate('/'); // Send them to the dashboard
+      loginWithToken(response.data.token, response.data.data.user);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
