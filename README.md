@@ -53,10 +53,11 @@ Menstrual health tracking is a genuinely underserved niche in most student proje
 
 ## Architecture & Key Design Decisions
 
-- **httpOnly cookies over localStorage for JWTs** — chosen specifically because localStorage is readable by any injected script (XSS risk), which felt like an unacceptable tradeoff for a health app handling sensitive personal data
+- **Authentication: Bearer token (JWT) via Authorization header** — originally implemented with JWTs in httpOnly cookies (the more secure default, since httpOnly cookies can't be read by injected scripts). However, deploying the frontend (Vercel) and backend (Render) on separate domains meant browsers treated the auth cookie as a third-party cookie, which is blocked by default in most modern browsers — even with `SameSite=None; Secure` set correctly. To keep the app fully functional across separate hosting domains on free-tier infrastructure, authentication was migrated to a Bearer token pattern: the JWT is returned in the login/signup response body, stored client-side, and manually attached as an `Authorization: Bearer <token>` header on every request via an Axios interceptor. This is a deliberate, documented tradeoff between the more locked-down cookie approach and practical cross-origin deployment constraints — a real-world consideration when frontend and backend are hosted separately.
 - **Every backend route scoped to `req.user.id`** — enforced consistently across all controllers (cycles, symptoms, partner settings) so a user can never read, edit, or delete another user's data, even with a guessed or leaked document ID
 - **Prediction logic: data-driven by default, with manual override** — the app calculates average cycle length from actual logged history once enough data exists, but respects a user's manual input if they toggle that preference on, balancing "smart automation" with user control
 - **Partner notifications reveal no health data** — this feature was deliberately designed so the notified party receives only a generic, supportive message, never actual dates or symptoms, preserving the primary user's privacy even when they choose to loop someone else in
+- **UTC-explicit date handling** — cycle dates are stored and compared using UTC to avoid off-by-one-day display bugs that occur when browser-local timezone conversions are applied inconsistently across components
 
 ---
 
