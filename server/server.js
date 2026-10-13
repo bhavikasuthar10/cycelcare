@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     'http://localhost:5173', 
+    'https://cycelcare.vercel.app',
     'https://cycelcare-gqphc8xy2-bhavika-suthar.vercel.app',
     'https://cycelcare-git-main-bhavika-suthar.vercel.app'
   ],
