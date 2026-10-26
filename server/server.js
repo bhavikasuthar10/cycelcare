@@ -23,7 +23,8 @@ app.use(cors({
     'http://localhost:5173', 
     'https://cycelcare.vercel.app',
     'https://cycelcare-gqphc8xy2-bhavika-suthar.vercel.app',
-    'https://cycelcare-git-main-bhavika-suthar.vercel.app'
+    'https://cycelcare-git-main-bhavika-suthar.vercel.app',
+     'https://cycelcare-nzjcsf2xl-bhavika-suthar.vercel.app'
   ],
   credentials: true
 }));
